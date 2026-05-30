@@ -1,14 +1,21 @@
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-from app.core.config import settings
 
-# Async SQLAlchemy engine — connects to PostgreSQL via asyncpg driver
-engine = create_async_engine(settings.database_url, echo=settings.debug)
-
-# Session factory — each request gets its own session
-SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
-
-# Base class all ORM models inherit from
 class Base(DeclarativeBase):
     pass
+
+
+_engine: AsyncEngine | None = None
+
+
+def get_engine() -> AsyncEngine:
+    global _engine
+    if _engine is None:
+        from app.core.config import settings
+        _engine = create_async_engine(settings.database_url, echo=settings.debug)
+    return _engine
+
+
+def get_session_factory():
+    return async_sessionmaker(get_engine(), expire_on_commit=False)
