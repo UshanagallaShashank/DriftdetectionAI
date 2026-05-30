@@ -1,4 +1,4 @@
-.PHONY: install install-be install-fe dev dev-be dev-fe test test-be test-fe build setup env
+.PHONY: install install-be install-fe dev dev-be dev-fe test test-be test-fe build setup env migrate-new migrate-up migrate-down
 
 setup: install env
 	@echo "Project ready. Run 'make dev' to start."
@@ -34,3 +34,12 @@ test-fe:
 
 build:
 	cd frontend && npm run build
+
+migrate-new:
+	cd backend && .venv/bin/alembic revision --autogenerate -m "$(name)"
+
+migrate-up:
+	cd backend && .venv/bin/alembic upgrade head
+
+migrate-down:
+	cd backend && .venv/bin/alembic downgrade -1
