@@ -9,8 +9,27 @@ on:
       - main
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+
   autofix:
     name: Auto-fix & commit
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,30 +41,27 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-python@v5
+        if: needs.changes.outputs.backend == 'true'
         with:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
       - uses: actions/setup-node@v4
+        if: needs.changes.outputs.frontend == 'true'
         with:
           node-version: "20"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install backend tools
-        run: pip install ruff
-
-      - name: Install frontend tools
-        working-directory: frontend
-        run: npm ci
-
       - name: Fix backend (ruff)
-        run: ruff check backend/app --fix --exit-zero
+        if: needs.changes.outputs.backend == 'true'
+        run: pip install ruff && ruff check backend/app --fix --exit-zero
 
       - name: Fix frontend (eslint)
+        if: needs.changes.outputs.frontend == 'true'
         working-directory: frontend
-        run: npx eslint src --fix
+        run: npm ci && npx eslint src --fix
 
       - name: Commit fixes
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -55,7 +71,8 @@ jobs:
 
   quality:
     name: Code quality checks
-    needs: autofix
+    needs: [changes, autofix]
+    if: always() && (needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true') && needs.autofix.result != 'failure'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -76,7 +93,8 @@ jobs:
 
   backend:
     name: Backend — lint & test
-    needs: autofix
+    needs: [changes, autofix]
+    if: always() && needs.changes.outputs.backend == 'true' && needs.autofix.result != 'failure'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -121,7 +139,8 @@ jobs:
 
   frontend:
     name: Frontend — lint, type-check, test & build
-    needs: autofix
+    needs: [changes, autofix]
+    if: always() && needs.changes.outputs.frontend == 'true' && needs.autofix.result != 'failure'
     runs-on: ubuntu-latest
     defaults:
       run:
