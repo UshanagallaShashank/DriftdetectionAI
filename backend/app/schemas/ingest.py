@@ -1,5 +1,7 @@
 from typing import Any, Optional
+
 from pydantic import BaseModel
+
 
 # Payload accepted by the POST /behaviors/ingest endpoint
 class IngestRequest(BaseModel):

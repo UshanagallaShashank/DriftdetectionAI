@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 # Loads application configuration from environment variables and .env file
 class Settings(BaseSettings):
     app_name: str = "DriftdetectionAI"

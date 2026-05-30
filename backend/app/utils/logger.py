@@ -1,5 +1,6 @@
 import logging
 
+
 # Returns a configured logger instance for the given module name
 def get_logger(name: str) -> logging.Logger:
     logger = logging.getLogger(name)
