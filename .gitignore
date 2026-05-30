@@ -44,5 +44,4 @@ Thumbs.db
 .cursorrules
 .github/copilot-instructions.md
 .github/PULL_REQUEST_TEMPLATE.md
-.github/workflows/
 setup-git.sh
