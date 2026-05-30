@@ -9,6 +9,6 @@ router = APIRouter(prefix="/behaviors", tags=["behaviors"])
 def post_ingest(request: IngestRequest) -> IngestResponse:
     try:
         record = ingest_behavior(request)
-        return IngestResponse(behavior_id=record.id)
+        return IngestResponse(behavior_id=str(record.id))
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
