@@ -1,5 +1,7 @@
 from typing import AsyncGenerator
+
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.config import Settings, settings
 from app.core.database import SessionLocal
 
