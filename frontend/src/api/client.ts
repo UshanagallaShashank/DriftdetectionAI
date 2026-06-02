@@ -1,4 +1,4 @@
-const BASE = "http://localhost:8000/api/v1"
+const BASE = "/api/v1"
 
 export const ingestBehavior = (payload: unknown) =>
   fetch(`${BASE}/behaviors/ingest`, {

@@ -13,7 +13,9 @@ def get_engine() -> AsyncEngine:
     global _engine
     if _engine is None:
         from app.core.config import settings
-        _engine = create_async_engine(settings.database_url, echo=settings.debug)
+        url = settings.database_url.replace("postgresql://", "postgresql+asyncpg://", 1) \
+            if "asyncpg" not in settings.database_url else settings.database_url
+        _engine = create_async_engine(url, echo=settings.debug)
     return _engine
 
 
