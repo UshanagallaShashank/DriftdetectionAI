@@ -8,7 +8,8 @@ from app.api.dependencies import get_db
 from app.core.database import Base
 from main import app
 
-TEST_DB_URL = os.environ["TEST_DATABASE_URL"]
+_raw = os.environ["TEST_DATABASE_URL"]
+TEST_DB_URL = _raw.replace("postgresql://", "postgresql+asyncpg://", 1) if "asyncpg" not in _raw else _raw
 
 
 @pytest.fixture

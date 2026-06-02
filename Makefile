@@ -27,7 +27,7 @@ dev-fe:
 test: test-be test-fe
 
 test-be:
-	cd backend && .venv/bin/pytest -v
+	cd backend && TEST_DATABASE_URL=$${TEST_DATABASE_URL:?set TEST_DATABASE_URL first} .venv/bin/pytest -v
 
 test-fe:
 	cd frontend && npm run test
