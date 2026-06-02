@@ -14,3 +14,14 @@ export interface IngestResponse {
   behavior_id: string
   status: string
 }
+
+export interface DriftReport {
+  id: string
+  system_id: string
+  analyzed_at: string
+  behavior_count: number
+  drift_detected: boolean
+  confidence: number
+  summary: string
+  anomalies: string[]
+}
