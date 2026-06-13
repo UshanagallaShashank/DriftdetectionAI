@@ -11,3 +11,9 @@ def get_logger(name: str) -> logging.Logger:
     if not logger.handlers:
         logger.addHandler(handler)
     return logger
+
+
+# Format error message with exception context for logging
+def format_error(error: Exception, context: str = "") -> str:
+    msg = f"{type(error).__name__}: {str(error)}"
+    return f"{context} | {msg}" if context else msg
