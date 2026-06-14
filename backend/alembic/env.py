@@ -7,6 +7,8 @@ from app.core.config import settings
 from app.core.database import Base
 
 config = context.config
+_raw = settings.database_url
+DB_URL = _raw.replace("postgresql://", "postgresql+asyncpg://", 1) if "asyncpg" not in _raw else _raw
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
@@ -14,13 +16,13 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
-    context.configure(url=settings.database_url, target_metadata=target_metadata,
+    context.configure(url=DB_URL, target_metadata=target_metadata,
                       literal_binds=True, dialect_opts={"paramstyle": "named"})
     with context.begin_transaction():
         context.run_migrations()
 
 async def run_async_migrations() -> None:
-    engine = create_async_engine(settings.database_url, poolclass=pool.NullPool)
+    engine = create_async_engine(DB_URL, poolclass=pool.NullPool)
     async with engine.begin() as conn:
         await conn.run_sync(lambda c: context.configure(
             connection=c, target_metadata=target_metadata))
